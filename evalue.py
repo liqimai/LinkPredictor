@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # coding: utf-8
 import argparse
 import subprocess
@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
     subprocess.run(
         [
-            "MetaPath", 
+            "bin/MetaPath", 
             args.train_graph,   # <train-set>
             args.relation,      # <relation-name>
             node_file,          # <node2id-file>

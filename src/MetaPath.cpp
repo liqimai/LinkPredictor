@@ -200,11 +200,12 @@ int MetaPath::get_number_of_path()const {
 
 double MetaPath::calculate_feature(const KnowledgeGraph& KG, const KnowledgeGraph::Node* src, const KnowledgeGraph::Node* dst, 
 	const KnowledgeGraph::Edge* forbiden_edge, int* path_start, int* path_end){
-	if (path_end == path_start)
+	if (path_end == path_start){
 		if (src == dst)
 			return 1;
 		else
 			return 0;
+	}
 	double p = 0;
 	int relation_id = *path_start;
 	int inversed_relation_id = inverse_relation_id(relation_id);

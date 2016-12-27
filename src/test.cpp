@@ -56,7 +56,7 @@ void save_mat(const char* output_file, const char* var, const Eigen::SparseMatri
 	// every column represents a pair of nodes
 	// every row represents a metapath
 	mat_sparse_t  sparse = { 0, };
-	size_t dims[2] = { rows, cols };
+	size_t dims[2] = { static_cast<size_t>(rows), static_cast<size_t>(cols) };
 	sparse.nzmax = (int)nnz;
 	sparse.nir = (int)nnz;
 	sparse.njc = (int)cols + 1;
@@ -112,6 +112,7 @@ int main(int argc, char const *argv[])
     if (argc != 8){
 		std::cout <<
 			"Usage: test <node-file> <relation-file> <test-graph> <relation> <metapath-file> <classifier-file> <thread-number>" << std::endl;
+		return -1;
     }
     
 

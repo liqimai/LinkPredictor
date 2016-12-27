@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # coding: utf-8
 import scipy.io as sio
 from sklearn.linear_model import LogisticRegression

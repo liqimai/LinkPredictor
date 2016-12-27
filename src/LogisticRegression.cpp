@@ -37,7 +37,7 @@ void LogisticRegression::save(std::ostream& os) const{
 
 //train classifier
 void LogisticRegression::train(Eigen::SparseMatrix<double>& design_matrix, Eigen::SparseMatrix<int>& label){
-	assert(("Waiting for implementation.",0));
+	assert("Waiting for implementation." && 0);
 }
 
 //predict

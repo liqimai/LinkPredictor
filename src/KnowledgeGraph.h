@@ -70,7 +70,7 @@ public:
 	void clear_edges();
 	void clear();
 	friend std::ostream& operator << (std::ostream &is, const KnowledgeGraph& KG);
-	friend MetaPath;
+	friend class MetaPath;
 
 private:
 	std::map<std::string, size_t> relation2id;
