@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
     subprocess.run(
         [
-            "bin/MetaPath", 
+            "./MetaPath", 
             args.train_graph,   # <train-set>
             args.relation,      # <relation-name>
             node_file,          # <node2id-file>

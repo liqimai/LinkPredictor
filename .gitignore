@@ -127,3 +127,8 @@ ENV/
 
 ##### mac ####
 .DS_Store
+data
+
+##### clion #####
+cmake*
+.idea

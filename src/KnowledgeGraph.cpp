@@ -1,7 +1,6 @@
 #include "KnowledgeGraph.h"
 #include <assert.h>
 #include <random>
-#include <chrono>
 using namespace std;
 
 size_t KnowledgeGraph::get_node_id(const std::string &node_name) const {
@@ -30,15 +29,6 @@ size_t KnowledgeGraph::add_node(const string& node_name){
         return it->second;
     }
 }
-
-//std::map<std::string, int> relation2id;
-//std::vector<std::string> id2relation;
-//
-//std::map<std::string, int> node2id;
-//std::vector<std::string> id2node;
-//
-//std::vector<Node*> nodes;
-//std::vector<std::vector<Edge*> > relations;
 
 void KnowledgeGraph::clear_edges(){
 	for (std::vector<Edge*>& relation : relations){
@@ -104,14 +94,14 @@ void KnowledgeGraph::load(istream& is){
 	assert(is.good());
     string src, relation, dst;
     while(!is.eof()){
-        is >> src >> relation >> dst;
+        is >> src >> dst >> relation;
 		//cout << src << ' ' << relation << ' ' << dst << endl;
 		assert(!is.fail());
 		size_t src_id = add_node(src);
 		size_t dst_id = add_node(dst);
 		size_t relation_id = add_relation(relation);
 		add_edge(src_id, dst_id, relation_id);
-		is >> ws;
+		std::ws(is);
 	}
 	cout << "Load successfully!" << endl;
     cout << "#nodes     " << nodes.size() << endl;
@@ -197,7 +187,7 @@ void KnowledgeGraph::load_relation_names(istream& is){
 		is >> relation_name;
 		assert(!is.fail());
 		add_relation(relation_name);
-		is >> ws;
+		std::ws(is);
 	}
 }
 
@@ -209,7 +199,7 @@ void KnowledgeGraph::load_node_names(istream& is){
 		is >> node_name;
 		assert(!is.fail());
 		add_node(node_name);
-		is >> ws;
+		std::ws(is);
 	}
 }
 

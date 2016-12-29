@@ -1,1 +1,0 @@
-cc -lmatio  MetaPath.o main.o KnowledgeGraph.o LogisticRegression.o verbosity.o   -o MetaPath
