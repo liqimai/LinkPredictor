@@ -20,7 +20,7 @@ public:
 		mux.lock();
 		count++;
 		if (count >= next || count == total){
-			cout << count << '/' << total << endl;
+			cout << "\e[A" << count << '/' << total << endl;
 			next += total / 100;
 		}
 		mux.unlock();
@@ -66,7 +66,7 @@ MetaPath* MetaPath::extract_from(const KnowledgeGraph& KG, string relation_name,
 		cout << "Find meta path for \"" << relation_name << '"' << endl;
 		cout << "        Max Length: " << max_length << endl;
 		cout << "        Edges:      " << relation.size() << endl;
-		cout << "        Threads:    " << thread_number << endl;
+		cout << "        Threads:    " << thread_number << endl << endl;
 	}
 
 	ProgressRecord progress_record(relation.size());
@@ -325,7 +325,7 @@ void MetaPath::calculate_feature(const KnowledgeGraph& KG, istream& node_name_pa
 			(KnowledgeGraph::Node*) &KG.get_node(KG.get_node_id(src_name)),
 			(KnowledgeGraph::Node*) &KG.get_node(KG.get_node_id(dst_name))
 			));
-		node_name_pairs >> ws;
+		std::ws(node_name_pairs);
 	}
 	calculate_feature(KG, node_pairs, forbiden_edges, design_matrix, thread_number);
 }
@@ -347,7 +347,7 @@ void MetaPath::calculate_feature(const KnowledgeGraph& KG,
 		std::cout << "calculate_feature..." << std::endl;
 		std::cout << "        #pairs   : " << node_pairs.size() << std::endl;
 		std::cout << "        #features: " << get_number_of_path() << std::endl;
-		std::cout << "        #threads : " << thread_number << std::endl;
+		std::cout << "        #threads : " << thread_number << std::endl << std::endl;
 	}
 	//start threads
 	for (int i = 0; i < thread_number; i++){
@@ -443,7 +443,7 @@ istream& operator >> (istream &is, MetaPath& meta_path) {
 	meta_path.children.clear();
 	is >> meta_path.relation_id >> meta_path.reach_dst;
 	assert(!is.fail() && !is.eof());
-	while (is >> std::ws, is.peek() != '$'){
+	while (std::ws(is), is.peek() != '$'){
 		MetaPath *child = new MetaPath();
 		is >> *child;
 		meta_path.children.push_back(child);

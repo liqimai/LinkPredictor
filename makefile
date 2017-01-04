@@ -1,3 +1,5 @@
+DATA_LINK = "https://www.dropbox.com/s/bv40ytyrnx12816/data.zip"
+
 all: bin/MetaPath bin/KGtest data
 
 clean:
@@ -28,5 +30,5 @@ src/MetaPath:
 .PHONY: src/KGtest src/MetaPath
 
 data:
-	wget "https://www.dropbox.com/s/ktgikfa6ybltroo/data.zip"
+	wget $(DATA_LINK)
 	unzip data.zip
