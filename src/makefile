@@ -3,7 +3,7 @@ CXX ?= g++
 LD  ?= ld
 CFLAGS  += -g
 CXXFLAGS+= -std=c++11 -g -O3
-LDFLAGS += -lmatio
+LDFLAGS += -lmatio -pthread
 SHARED_OUT += KnowledgeGraph.o LogisticRegression.o MetaPath.o verbosity.o
 
 all: MetaPath KGtest KGinfo clean

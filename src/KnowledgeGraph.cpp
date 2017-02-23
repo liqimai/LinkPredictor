@@ -1,6 +1,7 @@
 #include "KnowledgeGraph.h"
 #include <assert.h>
 #include <random>
+#include <chrono>
 using namespace std;
 
 size_t KnowledgeGraph::get_node_id(const std::string &node_name) const {

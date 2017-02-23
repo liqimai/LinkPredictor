@@ -1,4 +1,4 @@
-DATA_LINK = "https://www.dropbox.com/s/bv40ytyrnx12816/data.zip"
+DATA_LINK = "https://www.dropbox.com/s/ybzpfq62s673p3d/data.zip"
 
 all: bin/MetaPath bin/KGtest bin/KGinfo data
 
