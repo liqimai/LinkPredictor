@@ -1,6 +1,6 @@
 DATA_LINK = "https://www.dropbox.com/s/bv40ytyrnx12816/data.zip"
 
-all: bin/MetaPath bin/KGtest data
+all: bin/MetaPath bin/KGtest bin/KGinfo data
 
 clean:
 	$(MAKE) -C src clean
@@ -8,7 +8,7 @@ clean:
 
 cleanest: clean
 	$(MAKE) -C src cleanest
-	@rm -rf bin/MetaPath bin/KGtest data || echo "Already cleanest"
+	@rm -rf bin/MetaPath bin/KGtest bin/KGinfo data || echo "Already cleanest"
 
 .PHONY: all clean cleanest 
 
@@ -21,13 +21,19 @@ bin/MetaPath: src/MetaPath
 bin/KGtest: src/KGtest  
 	cp src/KGtest bin/
 
+bin/KGinfo: src/KGinfo
+	cp src/KGinfo bin/
+
 src/KGtest:
 	$(MAKE) -C src KGtest
 
 src/MetaPath:
 	$(MAKE) -C src MetaPath
 
-.PHONY: src/KGtest src/MetaPath
+src/KGinfo:
+	$(MAKE) -C src KGinfo
+
+.PHONY: src/KGtest src/MetaPath src/KGinfo
 
 data:
 	wget $(DATA_LINK)

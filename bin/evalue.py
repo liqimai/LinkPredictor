@@ -25,8 +25,10 @@ if __name__ == '__main__':
         directory, 
         args.relation.replace('/','_'))
 
-    if not os.access(relation_directory, os.F_OK):
+    if not os.path.exists(relation_directory):
         os.mkdir(relation_directory)
+    if not os.path.isdir(relation_directory):
+        raise TypeError(relation_directory+'is not a directory')
     node_file = os.path.join(directory, 'node2id.txt')
     relation_file = os.path.join(directory, 'relation2id.txt')
     metapath_file =  os.path.join(relation_directory, 'metapath.txt')
@@ -35,9 +37,9 @@ if __name__ == '__main__':
     metapath_list_file = os.path.join(relation_directory, 'metapath_list.txt')
     classifier_file = os.path.join(relation_directory, 'clf_LR.txt')
     result_file = os.path.join(relation_directory, 'result.txt')
-
+    metapath_exe = os.path.join(os.path.split(os.path.realpath(__file__))[0], './MetaPath')
     metapath_args = [
-            "./MetaPath", 
+            metapath_exe,
             args.train_graph,   # <train-set>
             args.relation,      # <relation-name>
             node_file,          # <node2id-file>
@@ -52,20 +54,23 @@ if __name__ == '__main__':
         ]
     subprocess.run(metapath_args, check=True)
 
+    LogisticRegression_script = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'LogisticRegression.py')
     subprocess.run([
         "python",
-        "LogisticRegression.py",
+        LogisticRegression_script,
         mat_file,
         lable_file,
         '--save',
         classifier_file
         ], check=True)
 
+    KGtest_exe = os.path.join(os.path.split(os.path.realpath(__file__))[0], './KGtest')
     subprocess.run(
         [
-            "./KGtest",         # KGtest
+            KGtest_exe,         # KGtest
             node_file,          # <node-file>
             relation_file,      # <relation-file>
+            args.train_graph,   # <origin-graph>
             args.test_graph,    # <test-graph>
             args.relation,      # <relation>
             metapath_file,      # <metapath-file>
@@ -74,3 +79,4 @@ if __name__ == '__main__':
             str(args.thread),   # <thread-number>
             str(args.verbose)   # <verbosity>
         ], check=True)
+

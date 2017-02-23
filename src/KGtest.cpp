@@ -3,26 +3,31 @@
 #include "KnowledgeGraph.h"
 #include "MetaPath.h"
 #include "matio.h"
-#include <iostream>
 #include <fstream>
 #include <assert.h>
-
+#include <iomanip>
 double AP(Eigen::VectorXd& predictions, std::vector<int>& label){
     assert(predictions.size() == label.size());
     std::vector<double> positive_sample_result;
     std::vector<size_t> positive_sample_rank;
 
     for (size_t i = 0; i < label.size(); i++){
-        if (label[i]){
+        if (label[i] == 2){
             double prediction = predictions[i];
-            int rank = 0;
+            size_t rank = 0;
+//            std::cout << prediction << std::endl;
+//            if(prediction < -5){
+//                for(int l = 0; l < predictions.size(); l++){
+//                    std::cout << predictions[l] << '\t' << label[l] << std::endl;
+//                }
+//            }
 
             for (size_t j = 0; j < positive_sample_result.size(); j++)
                 if (positive_sample_result[j] == prediction)
                     positive_sample_rank[j] += 1;
 
             for (int k = 0; k < predictions.size(); k++)
-                if (predictions[k] > prediction)
+                if (predictions[k] > prediction && label[k] == 0)
                     rank++;
 
             positive_sample_result.push_back(prediction);
@@ -109,41 +114,45 @@ void save_mat(const char* output_file, const char* var, const Eigen::SparseMatri
 
 int main(int argc, char const *argv[])
 {
-    if (argc != 10){
+    if (argc != 11){
         std::cout <<
-            "Usage: test <node-file> <relation-file> <test-graph> <relation> <metapath-file> <classifier-file> <result-file> <thread-number> <verbosity>" << std::endl;
+            "Usage: test <node-file> <relation-file> <origin-graph> <test-graph> <relation> <metapath-file> <classifier-file> <result-file> <thread-number> <verbosity>" << std::endl;
         return -1;
     }
     
-
-    std::ifstream node_file(argv[1]);
+    int arg_position=1;
+    std::ifstream node_file(argv[arg_position++]);
     assert(node_file.is_open());
-    std::ifstream relation_file(argv[2]);
+    std::ifstream relation_file(argv[arg_position++]);
     assert(relation_file.is_open());
-    std::ifstream graph_file(argv[3]);
-    assert(graph_file.is_open());
-    std::string relation_name(argv[4]);/*KG.get_relation_names()[0]*/
-    std::ifstream metapath_file(argv[5]);
+    std::ifstream origin_graph_file(argv[arg_position++]);
+    assert(origin_graph_file.is_open());
+    std::ifstream test_graph_file(argv[arg_position++]);
+    assert(test_graph_file.is_open());
+    std::string relation_name(argv[arg_position++]);/*KG.get_relation_names()[0]*/
+    std::ifstream metapath_file(argv[arg_position++]);
     assert(metapath_file.is_open());
-    std::ifstream classifier_file(argv[6]);
+    std::ifstream classifier_file(argv[arg_position++]);
     assert(classifier_file.is_open());
-    std::ofstream result_file(argv[7]);
+    std::ofstream result_file(argv[arg_position++]);
     assert(result_file.is_open());
-    int thread_number = atoi(argv[8]);
+    int thread_number = atoi(argv[arg_position++]);
     assert(thread_number > 0);
-    verbosity = atoi(argv[9]);
+    verbosity = atoi(argv[arg_position++]);
     assert(verbosity >= 0);
 
     KnowledgeGraph KG;
+    std::vector<std::vector<KnowledgeGraph::Edge*> > test_edge;
     KG.load_node_names(node_file);
     KG.load_relation_names(relation_file);
-    KG.load(graph_file);
+    KG.load(origin_graph_file);
+    KG.load_test(test_graph_file, test_edge);
     node_file.close();
     relation_file.close();
-    graph_file.close();
+    test_graph_file.close();
     assert(!node_file.is_open());
     assert(!relation_file.is_open());
-    assert(!graph_file.is_open());
+    assert(!test_graph_file.is_open());
 
     //KG.save_node_names(std::ofstream("node.txt"));
     //KG.save_relation_names(std::ofstream("relation.txt"));
@@ -162,7 +171,7 @@ int main(int argc, char const *argv[])
     classifier_file.close();
     assert(!classifier_file.is_open());
 
-    auto& relation = KG.get_relations()[relation_id];
+    auto relation = test_edge[relation_id];
     double map = 0, map_for_src = 0, map_for_dst = 0;
     int count = 0;
     std::cout << std::endl;
@@ -178,7 +187,7 @@ int main(int argc, char const *argv[])
         Eigen::VectorXd predictions;
 
         // std::cout << "generate_test_set..." << std::endl;
-        KG.generate_test_set(edge->src, relation_id, false, node_pairs, labels, forbiden_edges);
+        KG.generate_test_set(edge, relation_id, false, node_pairs, labels, forbiden_edges);
 
         //KG.vector_of_node_pairs_to_os(node_pairs, std::ofstream("change_dst.txt"));
         //KG.vector_of_labels_to_os(labels, std::ofstream("change_dst_labels.txt"));
@@ -198,7 +207,7 @@ int main(int argc, char const *argv[])
         map_for_src += ap1;
 
         // std::cout << "generate_test_set..." << std::endl;
-        KG.generate_test_set(edge->dst, relation_id, true, node_pairs, labels, forbiden_edges);
+        KG.generate_test_set(edge, relation_id, true, node_pairs, labels, forbiden_edges);
 
         //KG.vector_of_node_pairs_to_os(node_pairs, std::ofstream("change_src.txt"));
         //KG.vector_of_labels_to_os(labels, std::ofstream("change_src_labels.txt"));
@@ -232,11 +241,12 @@ int main(int argc, char const *argv[])
     map = map / relation.size() / 2;
     map_for_src /= relation.size();
     map_for_dst /= relation.size();
-
+    std::cout << std::setprecision(4);
     std::cout << "MAP= " << map << " for relation " << relation_name << std::endl;
     std::cout << "MAP for src= " << map_for_src << '\n';
     std::cout << "MAP for dst= " << map_for_dst << std::endl;
 
+    std::cout << std::setprecision(4);
     result_file << "MAP= " << map << " for relation " << relation_name << '\n';
     result_file << "MAP for src= " << map_for_src << '\n';
     result_file << "MAP for dst= " << map_for_dst << "\n";
