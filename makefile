@@ -8,7 +8,7 @@ clean:
 
 cleanest: clean
 	$(MAKE) -C src cleanest
-	@rm -rf bin/MetaPath bin/KGtest bin/KGinfo data || echo "Already cleanest"
+	@rm -rf bin/MetaPath bin/KGtest bin/KGinfo || echo "Already cleanest"
 
 .PHONY: all clean cleanest 
 
